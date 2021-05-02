@@ -1,4 +1,4 @@
-# Map for Self Driving Car
+# Map for Self Driving Car - python 2.7.13
 
 # Importing the libraries
 import numpy as np
@@ -130,7 +130,7 @@ class Game(Widget):
 		last_signal = [self.car.signal1, self.car.signal2, self.car.signal3, orientation, -orientation] # our input state vector, composed of the three signals received by the three sensors, plus the orientation and -orientation
 		action = brain.update(last_reward, last_signal) # playing the action from our ai (the object brain of the dqn class)
 		scores.append(brain.score()) # appending the score (mean of the last 100 rewards to the reward window)
-		rotation = action2rotation[action] # converting the action played (0, 1 or 2) into the rotation angle (0°, 20° or -20°)
+		rotation = action2rotation[action] # converting the action played (0, 1 or 2) into the rotation angle (0, 20 or -20)
 		self.car.move(rotation) # moving the car according to this last rotation angle
 		distance = np.sqrt((self.car.x - goal_x) ** 2 + (self.car.y - goal_y) ** 2) # getting the new distance between the car and the goal right after the car moved
 		self.ball1.pos = self.car.sensor1 # updating the position of the first sensor (ball1) right after the car moved
