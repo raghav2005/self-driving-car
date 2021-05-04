@@ -7,7 +7,7 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as functional
-import torch.optim as optimizer
+import torch.optim as optim
 import torch.autograd as autograd
 from torch.autograd import Variable
 
@@ -55,4 +55,23 @@ class memory_replay(object):
 
 # implement deep q-learning
 class deep_q_network():
-	pass
+	
+	def __init__(self, input_neuron_num, output_neuron_num, gamma):
+		self.gamma = gamma
+		self.reward_window = []
+		self.neural_network_model = neural_network(input_neuron_num, \
+			output_neuron_num)
+		self.memory_of_events = memory_replay(100000)
+		self.optimizer = optim.Adam(self.neural_network_model.parameters(), \
+			lr = 0.001)
+		self.last_state = torch.Tensor(input_neuron_num).unsqueeze(0)
+		self.last_action = 0
+		self.last_reward = 0
+	
+	def select_action(self, state):
+		probabilities = functional.softmax(self.model(Variable(state, \
+			volatile = True)) * 7)
+		action = probabilities.multinomial()
+
+		return action.data[0, 0]
+
