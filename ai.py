@@ -67,7 +67,7 @@ class deep_q_network():
 	
 	def select_action(self, state):
 		probabilities = functional.softmax(self.neural_network_model( \
-			Variable(state, volatile = True)) * 500)
+			Variable(state, volatile = True)) * 100)
 		action = probabilities.multinomial()
 
 		return action.data[0, 0]
