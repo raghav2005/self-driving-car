@@ -19,13 +19,10 @@ class neural_network(nn.Module):
 
 		self.input_neuron_num = input_neuron_num 
 		self.output_neuron_num = output_neuron_num
-		self.hidden_neuron_num = 30
-		self.in_to_hid_full_connection = nn.Linear(input_neuron_num, \
-			hidden_neuron_num)
-		self.hid_to_out_full_connection = nn.Linear(hidden_neuron_num, \
-			output_neuron_num)
-		
-	def forward_propagation(self, input_state):
+		self.in_to_hid_full_connection = nn.Linear(input_neuron_num, 30)
+		self.hid_to_out_full_connection = nn.Linear(30, output_neuron_num)
+
+	def forward(self, input_state):
 		activated_hidden_neurons = functional.relu( \
 			self.in_to_hid_full_connection(input_state))
 		output_neuron_q_vals = self.hid_to_out_full_connection( \
@@ -69,15 +66,15 @@ class deep_q_network():
 		self.last_reward = 0
 	
 	def select_action(self, state):
-		probabilities = functional.softmax(self.model(Variable(state, \
-			volatile = True)) * 7)
+		probabilities = functional.softmax(self.neural_network_model( \
+			Variable(state, volatile = True)) * 500)
 		action = probabilities.multinomial()
 
 		return action.data[0, 0]
 
 	def learn(self, batch_state, batch_state_next, batch_reward, batch_action):
-		outputs = self.neural_network_model(batch_state).gather( \
-			1, batch_action.unsqueeze(1)).squeeze(1)
+		outputs = self.neural_network_model(batch_state).gather(1, \
+			batch_action.unsqueeze(1)).squeeze(1)
 		next_outputs = self.neural_network_model(batch_state_next \
 			).detach().max(1)[0]
 
@@ -93,13 +90,13 @@ class deep_q_network():
 	def update(self, reward, new_signal):
 		new_state = torch.Tensor(new_signal).float().unsqueeze(0)
 		self.memory_of_events.push_to_memory((self.last_state, new_state, \
-			torch.LongTensor([int(self.last_action)]), \
-				torch.Tensor([self.last_reward])))
+			torch.LongTensor([int(self.last_action)]), torch.Tensor( \
+			[self.last_reward])))
 		
 		action = self.select_action(new_state)
 
 		if len(self.memory_of_events.memory_of_events) > 100:
-			batch_state, batch_state_next, batch_reward, batch_action = \
+			batch_state, batch_state_next, batch_action, batch_reward = \
 				self.memory_of_events.get_sample(100)
 			self.learn(batch_state, batch_state_next, batch_reward, \
 				batch_action)
