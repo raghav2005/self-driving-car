@@ -113,3 +113,27 @@ class deep_q_network():
 			del self.reward_window[0]
 		
 		return action
+	
+	def score(self):
+		return sum(self.reward_window) / (len(self.reward_window) + 1.)
+	
+	def save(self):
+		torch.save({'state_dict': self.neural_network_model.state_dict(), \
+			'optimizer': self.optimizer.state_dict()}, 'last_brain.pth')
+	
+	def load(self):
+
+		if os.path.isfile('last_brain.pth'):
+			print('==> loading checkpoint...')
+			
+			checkpoint = torch.load('last_brain.pth')
+
+			self.neural_network_model.load_state_dict(checkpoint['state_dict'])
+			self.optimizer.load_state_dict(checkpoint['optimizer'])
+
+			print('done!')
+		
+		else:
+			print('no checkpoint found...')
+
+
