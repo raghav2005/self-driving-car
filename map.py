@@ -12,6 +12,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.graphics import Color, Ellipse, Line
 from kivy.config import Config
+from kivy.cache import Cache
 from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty
 from kivy.vector import Vector
 from kivy.clock import Clock
@@ -19,8 +20,16 @@ from kivy.clock import Clock
 # Importing the Dqn object from our AI in ai.py
 from ai import deep_q_network as Dqn
 
+Config.set('graphics', 'resizable', 0)
+Config.set('graphics', 'width', '1200')
+Config.set('graphics', 'height', '800')
+
 # Adding this line if we don't want the right click to put a red point
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
+
+# Clears map cache
+Cache._categories['kv.image']['timeout'] = 1
+Cache._categories['kv.texture']['timeout'] = 1
 
 # Introducing last_x and last_y, used to keep the last point in memory when we draw the sand on the map
 last_x = 0
@@ -41,7 +50,7 @@ def init():
 	global goal_x
 	global goal_y
 	global first_update
-	sand = np.zeros((longueur, largeur))
+	sand = np.zeros((longueur, largeur), dtype = np.uint8)
 	goal_x = 20
 	goal_y = largeur - 20
 	first_update = False
@@ -200,13 +209,17 @@ class MyPaintWidget(Widget):
 class CarApp(App):
 
 	def build(self):
+		global clearbtn
+		global savebtn
+		global loadbtn
+
 		parent = Game()
 		parent.serve_car()
 		Clock.schedule_interval(parent.update, 1.0 / 60.0)
 		self.painter = MyPaintWidget()
-		clearbtn = Button(text = 'clear')
-		savebtn = Button(text = 'save', pos = (parent.width, 0))
-		loadbtn = Button(text = 'load', pos = (2 * parent.width, 0))
+		clearbtn = Button(text = 'clear', opacity = 0.7)
+		savebtn = Button(text = 'save', pos = (parent.width, 0), opacity = 0.7)
+		loadbtn = Button(text = 'load', pos = (2 * parent.width, 0), opacity = 0.7)
 		clearbtn.bind(on_release = self.clear_canvas)
 		savebtn.bind(on_release = self.save)
 		loadbtn.bind(on_release = self.load)
